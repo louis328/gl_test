@@ -1,0 +1,23 @@
+{
+    "data":
+     [
+        {
+            "id": "walk", 
+            "motion": 
+            [
+                {"frame": 5, "start_x": 0,     "start_y": 0,   "end_x": 64,     "end_y": 64}, 
+                {"frame": 5, "start_x": 80,   "start_y": 0,   "end_x": 144,   "end_y": 64}, 
+                {"frame": 5, "start_x": 160, "start_y": 0,   "end_x": 224,   "end_y": 64}, 
+                {"frame": 5, "start_x": 240, "start_y": 0,   "end_x": 304,   "end_y": 64}
+            ]
+        },
+        {
+            "id": "stand", 
+            "motion": 
+            [
+                {"frame": 5, "start_x": 80,   "start_y": 0,   "end_x": 144,   "end_y": 64}
+            ]
+        }
+        
+    ]
+}

@@ -1,0 +1,23 @@
+* {
+        margin:0; 
+        padding:0;
+}
+body {
+        border: 0;
+        background-color: rgb(255, 255, 255);
+}
+canvas {
+        position: relative;
+        width: 800;
+        height: 600;
+        display: block;
+}
+#frontCanvas{
+        position:absolute;
+        z-index: 50;
+}
+#mainCanvas{
+        position: absolute;
+        z-index: 1;
+}
+
