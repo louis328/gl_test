@@ -1,24 +1,32 @@
+
 import {CANVAS_WIDTH, CANVAS_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT} from './Config.js';
-import {Shader, SecondShader, ShaderForSkinMesh, set_attribute, create_framebuffer} from './Shader.js';
-import {objManager} from './ObjectManager.js';
-import {resManager} from './ResourceManager.js';
-import {qtLIB, matLIB} from './minMatrix.js';
+//import {Shader, SecondShader, ShaderForSkinMesh, set_attribute, create_framebuffer} from './Shader.js';
+//import {objManager} from './ObjectManager.js';
+//import {resManager} from './ResourceManager.js';
+//import {qtLIB, matLIB} from './minMatrix.js';
 
 class Canvas {
     constructor() {
+        this.messageBox = document.getElementById('message');
+        this.messageBox.textContent += ":webgl start";
         try {
+            console.log("webgl start");
             this.time = 0;
-
+            //let canvas_element = document.getElementById('canvas');
+            //this.canvas = canvas_element.createElement('canvas');
             this.canvas = document.getElementById('mainCanvas');
+            this.canvas.textContent = "canvas";
             this.canvas.width = CANVAS_WIDTH;
             this.canvas.height = CANVAS_HEIGHT;
             this.context_gl = this.canvas.getContext('webgl2');//webgl2のコンテキスト作成
             if (!(window.WebGLRenderingContext && this.context_gl && this.context_gl.getShaderPrecisionFormat)) {
                 console.log("webgl非対応");
+                this.messageBox.textContent += ':webgl非対応';
                 return false;
             }
         } catch (e) {
             console.log("webgl非対応: " + e);
+            this.messageBox.textContent = 'webbl非対応 ' + e;
             return false;
         }
         let canvas_2d = document.getElementById("frontCanvas");//テキスト用
@@ -89,7 +97,7 @@ class Canvas {
             this.context_2d.font = "50px 'ＭＳ Ｐゴシック'";
             
 
-    }
+    }/*
     process(){
         ++this.time;
         this.start();
@@ -236,6 +244,7 @@ class Canvas {
     }
     getGLContext() {
         return this.context_gl;
-      }
+      }*/
 }
+
 export const canvas = new Canvas();

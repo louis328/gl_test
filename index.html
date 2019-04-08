@@ -2,8 +2,12 @@
 <html>
   <head>
       <title>TEST</title>
-      <script src="src/script.js" type="module"></script>
+      <script src="./src/Script.js" type="module"></script>
+      <script type="module">
+        console.log("es modules ok");
+      </script>
       <script nomodule type=text/javascript>
+        console.log("es modules error");
         document.getElementById('message').innerHTML += "<div>ES Modules未対応</div>";
       </script>
       <link rel="stylesheet" href="css/style.css">
@@ -148,9 +152,10 @@
   </head>
   <body>
       <div id="canvas">
-        <canvas id="mainCanvas"></canvas><canvas id="frontCanvas"></canvas>
-        
+        <canvas id="mainCanvas"></canvas>
+        <canvas id="frontCanvas"></canvas>
+        main
       </div>
-      <div id="message"></div>
+      <div id="message">message</div>
   </body>
 </html>
