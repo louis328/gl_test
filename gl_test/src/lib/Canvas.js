@@ -1,9 +1,9 @@
 
 import {CANVAS_WIDTH, CANVAS_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT} from './Config.js';
-//import {Shader, SecondShader, ShaderForSkinMesh, set_attribute, create_framebuffer} from './Shader.js';
-//import {objManager} from './ObjectManager.js';
-//import {resManager} from './ResourceManager.js';
-//import {qtLIB, matLIB} from './minMatrix.js';
+import {Shader, SecondShader, ShaderForSkinMesh} from './Shader.js';
+import {objManager} from './ObjectManager.js';
+import {resManager} from './ResourceManager.js';
+import {qtLIB, matLIB} from './minMatrix.js';
 
 class Canvas {
     constructor() {
@@ -39,7 +39,7 @@ class Canvas {
         this.shader1 = new Shader(this.context_gl);
         this.shader2 = new SecondShader(this.context_gl);
         this.shader_skin = new ShaderForSkinMesh(this.context_gl);
-        this.fBuffer = create_framebuffer(this.context_gl, CANVAS_WIDTH, CANVAS_HEIGHT);
+        this.fBuffer = this.create_framebuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
         
         
         document.documentElement.addEventListener('touchstart', function (e) {
@@ -97,7 +97,7 @@ class Canvas {
             this.context_2d.font = "50px 'ＭＳ Ｐゴシック'";
             
 
-    }/*
+    }
     process(){
         ++this.time;
         this.start();
@@ -244,7 +244,28 @@ class Canvas {
     }
     getGLContext() {
         return this.context_gl;
-      }*/
+    }
+    create_framebuffer(width, height){
+        let gl = this.context_gl;
+        var frameBuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+        var depthRenderBuffer = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, depthRenderBuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthRenderBuffer);
+        var fTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, fTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fTexture, 0);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        return {framebuffer: frameBuffer, renderbuffer: depthRenderBuffer, texture: fTexture};
+    }
 }
 
 export const canvas = new Canvas();

@@ -1,0 +1,28 @@
+ #version 300 es
+      in vec3 position;
+      in vec3 normal;
+      in vec2 texCoord;
+      in vec4 jointIndex;
+      in vec4 weight;
+
+      uniform mat4 mMatrix;
+      uniform mat4 mvpMatrix;
+      uniform mat4 normalMatrix;
+      uniform mat4 joinMatArray[32];//4*4*32
+
+      out vec3 vPosition;
+      out vec3 vNormal;
+      out vec2 vTexCoord;
+      
+      void main(){
+          mat4 mat;//スキンメッシュ用
+          mat = joinMatArray[int(jointIndex.x)] * weight.x;
+          mat += joinMatArray[int(jointIndex.y)] * weight.y;
+          mat += joinMatArray[int(jointIndex.z)] * weight.z;
+          mat += joinMatArray[int(jointIndex.w)] * weight.w;
+
+          vPosition = (mMatrix * vec4(position, 1.0)).xyz;
+          vNormal = (normalMatrix * mat * vec4(normal, 0.0)).xyz;
+          vTexCoord = texCoord;
+          gl_Position = mvpMatrix * mat * vec4(position, 1.0);
+      }

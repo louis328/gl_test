@@ -1,8 +1,8 @@
-import { ManagedObject } from '/3d/src/lib/ManagedObject.js';
-import { keyManager} from '/3d/src/lib/KeyManager.js';
-import { Player } from '/3d/src/game/character/Player.js'
-import { Model } from '/3d/src/lib/gltf/Model.js';
-import { Camera } from '/3d/src/lib/Camera.js';
+import { ManagedObject } from '/src/lib/ManagedObject.js';
+import { keyManager} from '/src/lib/KeyManager.js';
+import { Player } from '../character/Player.js'
+import { Model } from '/src/lib/gltf/Model.js';
+import { Camera } from '/src/lib/Camera.js';
 
 export class TitleScene extends ManagedObject{
     constructor(){
