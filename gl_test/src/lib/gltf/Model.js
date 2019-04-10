@@ -295,7 +295,7 @@ export class Model{
             }
             else{
                 primitive.materialData.pbrMetallicRoughness.baseColorTexture = new Object();
-                primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri = "/3d/src/lib/gltf/default.png";
+                primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri = "/gl_test/src/lib/gltf/default.png";
             }
         }
     }

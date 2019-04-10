@@ -1,0 +1,22 @@
+
+precision highp float;
+      
+uniform vec3 lightVec;
+uniform vec3 eyePosition;
+uniform sampler2D texture2dSampler;
+      
+varying vec3 vPosition;
+varying vec3 vNormal;
+varying vec2 vTexCoord;
+
+      
+void main(){
+        vec3 light = -normalize(lightVec);
+        vec3 eye = normalize(vPosition - eyePosition);
+        vec3 ref = normalize(reflect(eye, vNormal));
+        float diffuse = max(dot(light, vNormal) * 0.7 + 0.3, 0.2);
+        float specular = max(dot(light, ref), 0.0);
+        specular = pow(specular, 20.0);
+        vec4 samplerColor = texture2D(texture2dSampler, vTexCoord);
+        gl_FragColor = vec4(samplerColor.rgb * diffuse + specular, samplerColor.a);
+}

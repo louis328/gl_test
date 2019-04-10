@@ -154,15 +154,11 @@ export class Shader {
 		this.attLocation[0] = gl.getAttribLocation(this.prg, 'position');
 		this.attLocation[1] = gl.getAttribLocation(this.prg, 'normal');
 		this.attLocation[2] = gl.getAttribLocation(this.prg, 'texCoord');
-		this.attLocation[3] = gl.getAttribLocation(this.prg, 'jointIndex');
-		this.attLocation[4] = gl.getAttribLocation(this.prg, 'weight');
 
 		this.attStride = new Array(5);
 		this.attStride[0] = 3;//頂点は3
 		this.attStride[1] = 3;//法線は3
 		this.attStride[2] = 2;//uv座標は2
-		this.attStride[3] = 4;//joint番号最大4つ
-		this.attStride[4] = 4;//jointに対するweightも最大4つ
 
 		this.uniLocation = new Array();
 		this.uniLocation[0] = gl.getUniformLocation(this.prg, 'matrix');
@@ -235,7 +231,7 @@ export class SecondShader{
 		this.attLocation = new Array(1);
 		this.attLocation[0] = gl.getAttribLocation(this.prg, 'position');
 
-		this.attStride = new Array(2);
+		this.attStride = new Array(1);
 		this.attStride[0] = 3;//頂点は3
 
 		this.uniLocation = new Array(1);
@@ -351,7 +347,8 @@ export class ShaderForSkinMesh {//スキンメッシュ用にjointとweightを�
 	getStr() {
 		return this.attStride;
 	}
-	set_attribute(gl, vbo) {
+	set_attribute(vbo) {
+		let gl = this.gl;
 		// 引数として受け取った配列を処理する
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo[0]);
 		gl.enableVertexAttribArray(this.attLocation[0]);

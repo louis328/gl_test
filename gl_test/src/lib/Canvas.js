@@ -1,16 +1,20 @@
 
 import {CANVAS_WIDTH, CANVAS_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT} from './Config.js';
 import {Shader, SecondShader, ShaderForSkinMesh} from './Shader.js';
+import {ProjShader } from './shader/ProjShader.js';
+import {DefaultShader } from './shader/DefaultShader.js';
+import {SkinShader } from './shader/SkinShader.js';
 import {objManager} from './ObjectManager.js';
 import {resManager} from './ResourceManager.js';
 import {qtLIB, matLIB} from './minMatrix.js';
 
 class Canvas {
     constructor() {
+        this.version = 2;
         this.messageBox = document.getElementById('message');
         this.messageBox.textContent += ":webgl start";
         try {
-            console.log("webgl start");
+            console.log("webgl start!");
             this.time = 0;
             //let canvas_element = document.getElementById('canvas');
             //this.canvas = canvas_element.createElement('canvas');
@@ -20,9 +24,14 @@ class Canvas {
             this.canvas.height = CANVAS_HEIGHT;
             this.context_gl = this.canvas.getContext('webgl2');//webgl2のコンテキスト作成
             if (!(window.WebGLRenderingContext && this.context_gl && this.context_gl.getShaderPrecisionFormat)) {
-                console.log("webgl非対応");
-                this.messageBox.textContent += ':webgl非対応';
-                return false;
+                console.log("webgl2非対応, 1で起動");
+                this.context_gl = this.canvas.getContext('webgl');//ver1でコンテキスト作成
+                if (!(window.WebGLRenderingContext && this.context_gl && this.context_gl.getShaderPrecisionFormat)) {
+                    console.log("webgl非対応");
+                    this.messageBox.textContent += ':webgl非対応';
+                    return false;
+                }
+                this.version = 1;
             }
         } catch (e) {
             console.log("webgl非対応: " + e);
@@ -36,9 +45,9 @@ class Canvas {
 
         this.context_gl.viewport(0, 0, VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
 
-        this.shader1 = new Shader(this.context_gl);
-        this.shader2 = new SecondShader(this.context_gl);
-        this.shader_skin = new ShaderForSkinMesh(this.context_gl);
+        this.shader1 = new DefaultShader(this.context_gl, this.version);
+        this.shader2 = new ProjShader(this.context_gl, this.version);
+        this.shader_skin = new SkinShader(this.context_gl, this.version);
         this.fBuffer = this.create_framebuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
         
         
@@ -186,7 +195,7 @@ class Canvas {
         
         this.context_gl.activeTexture(this.context_gl.TEXTURE0);
         this.context_gl.bindTexture(this.context_gl.TEXTURE_2D, texture);
-        shader.set_attribute(this.context_gl, obj.VBOList);
+        shader.set_attribute(obj.VBOList);
         this.context_gl.bindBuffer(this.context_gl.ELEMENT_ARRAY_BUFFER, obj.vertexIndexBuffer);
         this.context_gl.drawElements(this.context_gl.TRIANGLES, obj.indexCount, this.context_gl.UNSIGNED_SHORT, 0);
     }

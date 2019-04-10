@@ -1,0 +1,7 @@
+precision highp float;
+uniform sampler2D texture2dSampler;
+varying vec2 vTexCoord;
+
+void main(){
+        gl_FragColor = texture2D(texture2dSampler, vTexCoord);
+}

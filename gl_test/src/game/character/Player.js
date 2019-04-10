@@ -1,13 +1,13 @@
-import { ManagedObject } from '/3d/src/lib/ManagedObject.js'
-import { Polygon } from '/3d/src/lib/Polygon.js'
-import { motionController} from '/3d/src/lib/MotionController.js';
-import { keyManager} from '/3d/src/lib/KeyManager.js';
+import { ManagedObject } from '/gl_test/src/lib/ManagedObject.js'
+import { Polygon } from '/gl_test/src/lib/Polygon.js'
+import { motionController} from '/gl_test/src/lib/MotionController.js';
+import { keyManager} from '/gl_test/src/lib/KeyManager.js';
 
 export class Player extends ManagedObject{
     constructor(){
         super("player");
-        this.image = new Polygon("/3d/res/image/block.png");
-        this.motion = motionController.create("/3d/res/motion/motion_hiyoko.json");
+        this.image = new Polygon("/gl_test/res/image/block.png");
+        this.motion = motionController.create("/gl_test/res/motion/motion_hiyoko.json");
         this.motion.start("stand");
         
 

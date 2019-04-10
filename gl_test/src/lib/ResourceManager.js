@@ -1,4 +1,4 @@
-import {canvas} from './canvas.js';
+import {canvas} from './Canvas.js';
 
 class ResourceManager{
     constructor(){
