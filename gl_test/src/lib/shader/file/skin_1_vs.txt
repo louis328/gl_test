@@ -8,7 +8,7 @@ attribute vec4 weight;
 uniform mat4 mMatrix;
 uniform mat4 mvpMatrix;
 uniform mat4 normalMatrix;
-uniform mat4 joinMatArray[32];//4*4*32
+uniform mat4 joinMatArray[28];//4*4*28
 
 varying vec3 vPosition;
 varying vec3 vNormal;

@@ -61,7 +61,7 @@ class Canvas {
               message['y'] = y;
               message['identifier'] = touch.identifier;
               message['message'] = 'touchStart';
-              ObjectManager.receive(message);
+              objManager.receive(message);
             }
             e.preventDefault();
           }, {passive: false});
@@ -75,7 +75,7 @@ class Canvas {
               message['y'] = y;
               message['identifier'] = touch.identifier;
               message['message'] = 'touchMove';
-              ObjectManager.receive(message);
+              objManager.receive(message);
             }
             e.preventDefault();
           }, {passive: false});
@@ -89,7 +89,7 @@ class Canvas {
               message['y'] = y;
               message['identifier'] = touch.identifier;
               message['message'] = 'touchEnd';
-              ObjectManager.receive(message);
+              objManager.receive(message);
             }
             e.preventDefault();
           }, {passive: false});
