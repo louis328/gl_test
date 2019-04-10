@@ -6,6 +6,7 @@ import {FPS} from '../Config.js';
 
 export class Model{
     constructor(url){
+        //console.log("Model : " + url);
         this.position = {x:0, y:0, z:0};
         this.frame_time = 0;
         this.animation = 0;
@@ -18,7 +19,7 @@ export class Model{
     //スキンメッシュ用のjointごとの変換行列を計算
     computeJointArray(skin, root_index){
         let matArray = new Array();
-        for(let i=0;i<32;++i){matArray.push(matLIB.identity(matLIB.create()));}
+        for(let i=0;i<16;++i){matArray.push(matLIB.identity(matLIB.create()));}
     
         let initial_mat = matLIB.identity(matLIB.create());
         if(this.file_data.nodes[0].matrix !== undefined){
@@ -35,7 +36,7 @@ export class Model{
             matLIB.multiply(matArray[joint_index], inverseBindMatrix, matArray[joint_index]);
         }
         let ret = [];
-        for(let i=0;i<32;++i){
+        for(let i=0;i<16;++i){
             for(var j=0;j<16;++j){
                 ret.push(matArray[i][j]);//matごとではなく、要素ごとに送らないと解釈してくれないらしい
             }
@@ -84,14 +85,20 @@ export class Model{
     }
         
     readFile(url){
-        this.dir_path = url.split("/").reverse().slice(1).reverse().join("/") + "/";
+        let dir = window.location.pathname;
+        this.file_path = dir.substring(0, dir.lastIndexOf('/'))
+         + url.substring(url.indexOf("/", 1), url.length);
+        
+        this.dir_path = this.file_path.split("/").reverse().slice(1).reverse().join("/") + "/";
+        //console.log("path : " + this.file_path);
         let thisInstance = this;
-        fetch(url).then(function(response) {
+        fetch(this.file_path).then(function(response) {
             return response.json();
         }).then(function(gltf) {
+            console.log("model readFile success : " + url);
             thisInstance.file_data = gltf;
             Promise.all( gltf.buffers.map(function(elem){return thisInstance.readBinaryFile(elem);}) ).then( function ( message ) {
-                console.log( message ) ;
+                //console.log( message ) ;
                 thisInstance.parseFileData();
                 objManager.modelArray.push(thisInstance);
             } ) ;
@@ -103,6 +110,8 @@ export class Model{
                 }
             }
             
+        }).catch(function(err) {
+            console.log("model readFile error : " + err);
         });
 
     }
@@ -129,7 +138,7 @@ export class Model{
                         let binary = this.parseAccessor(accessor);
                         skin.inverseBindMatrices = new Float32Array( (binary) );
                     }
-                    this.parseSkin(skin); console.log(this.file_data);
+                    this.parseSkin(skin); //console.log(this.file_data);
                     
                 }
             }

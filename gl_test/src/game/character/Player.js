@@ -1,7 +1,7 @@
-import { ManagedObject } from '/gl_test/src/lib/ManagedObject.js'
-import { Polygon } from '/gl_test/src/lib/Polygon.js'
-import { motionController} from '/gl_test/src/lib/MotionController.js';
-import { keyManager} from '/gl_test/src/lib/KeyManager.js';
+import { ManagedObject } from '../../../../gl_test/src/lib/ManagedObject.js'
+import { Polygon } from '../../../../gl_test/src/lib/Polygon.js'
+import { motionController} from '../../../../gl_test/src/lib/MotionController.js';
+import { keyManager} from '../../../../gl_test/src/lib/KeyManager.js';
 
 export class Player extends ManagedObject{
     constructor(){
