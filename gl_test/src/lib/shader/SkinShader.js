@@ -1,8 +1,8 @@
 import {Shader } from './Shader.js';
 
 export class SkinShader extends Shader {
-    constructor(gl) {
-        super(gl);
+    constructor(gl, ver=2) {
+        super(gl, ver);
         let shaderInstance = this;
         
         this.fetch_shader(this.file_dir + "skin_"+this.version+"_vs.txt", this.file_dir + "skin_"+this.version+"_fs.txt").then(function(response){

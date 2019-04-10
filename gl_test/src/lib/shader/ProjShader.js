@@ -1,8 +1,8 @@
 import {Shader } from './Shader.js';
 
 export class ProjShader extends Shader {
-    constructor(gl) {
-        super(gl);
+    constructor(gl, ver=2) {
+        super(gl, ver);
         let shaderInstance = this;
         
         this.fetch_shader(this.file_dir + "proj_"+this.version+"_vs.txt", this.file_dir + "proj_"+this.version+"_fs.txt").then(function(response){
