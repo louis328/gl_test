@@ -12,6 +12,7 @@ export class Model{
         this.animation = 0;
 
         this.dir_path = "";
+        this.root_path = "";
         this.file_data = null;
         this.readFile(url);
     }
@@ -86,8 +87,8 @@ export class Model{
         
     readFile(url){
         let dir = window.location.pathname;
-        this.file_path = dir.substring(0, dir.lastIndexOf('/'))
-         + url.substring(url.indexOf("/", 1), url.length);
+        this.root_path = dir.substring(0, dir.lastIndexOf('/'));
+        this.file_path = this.root_path + url.substring(url.indexOf("/", 1), url.length);
         
         this.dir_path = this.file_path.split("/").reverse().slice(1).reverse().join("/") + "/";
         //console.log("path : " + this.file_path);
@@ -302,10 +303,10 @@ export class Model{
             if(baseColorTexture !== undefined){
                 baseColorTexture.uri = this.file_data.images[baseColorTexture.index].uri;
             }
-            else{
+            else{console.log("qqq");
                 primitive.materialData.pbrMetallicRoughness.baseColorTexture = new Object();
-                primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri = "/gl_test/src/lib/gltf/default.png";
-            }
+                primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri = this.root_path + "/src/lib/gltf/default.png";
+            }console.log(primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri);
         }
     }
     parseSkin(skin){
