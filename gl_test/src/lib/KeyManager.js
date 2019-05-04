@@ -3,7 +3,7 @@ import { ManagedObject } from './ManagedObject.js'
 class KeyManager extends ManagedObject{
     constructor() {
         super("keyManager");
-        document.getElementById('canvas').keyManager = this;
+        document.getElementById('nio').keyManager = this;
         document.onkeydown = this.pressFunction;
         document.onkeyup = this.releaseFunction;
         this.keyState = new Object();

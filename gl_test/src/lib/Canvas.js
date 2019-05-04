@@ -11,14 +11,17 @@ import {qtLIB, matLIB} from './minMatrix.js';
 class Canvas {
     constructor() {
         this.version = 2;
+        let canvas_element = document.getElementById('nio');
+        
         this.messageBox = document.getElementById('message');
         this.messageBox.textContent += ":webgl start";
         try {
             console.log("webgl start!");
             this.time = 0;
-            //let canvas_element = document.getElementById('canvas');
-            //this.canvas = canvas_element.createElement('canvas');
-            this.canvas = document.getElementById('mainCanvas');
+            
+            this.canvas = document.createElement('canvas');
+            canvas_element.appendChild(this.canvas);
+            //this.canvas = document.getElementById('mainCanvas');
             this.canvas.textContent = "canvas";
             this.canvas.width = CANVAS_WIDTH;
             this.canvas.height = CANVAS_HEIGHT;
@@ -38,7 +41,9 @@ class Canvas {
             this.messageBox.textContent = 'webbl非対応 ' + e;
             return false;
         }
-        let canvas_2d = document.getElementById("frontCanvas");//テキスト用
+        //let canvas_2d = document.getElementById("frontCanvas");//テキスト用
+        let canvas_2d = document.createElement('canvas');
+        canvas_element.appendChild(canvas_2d);
         canvas_2d.width = CANVAS_WIDTH;
         canvas_2d.height = CANVAS_HEIGHT;
         this.context_2d = canvas_2d.getContext("2d");
