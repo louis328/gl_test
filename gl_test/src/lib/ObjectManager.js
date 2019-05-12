@@ -4,6 +4,7 @@ class ObjectManager{
         this.messageQueue = new Array();
         this.objHash = new Object();//ゲームオブジェクトを格納
         this.drawArray = new Array();//描画対象を格納する配列(2D)
+        this.boardArray = new Array();//Billboardを格納する
         this.modelArray = new Array();//gltfをまるごと入れる
     }
     process(){
@@ -29,6 +30,9 @@ class ObjectManager{
     }
     getDrawArray(){
         return this.drawArray;
+    }
+    getBoardArray(){
+        return this.boardArray;
     }
     getModelArray(){
         return this.modelArray;

@@ -4,7 +4,7 @@ export class DefaultShader extends Shader {
     constructor(gl, ver=2) {
         super(gl, ver);
         let shaderInstance = this;
-        
+        console.log(this.file_dir);
         this.fetch_shader(this.file_dir + "default_"+this.version+"_vs.txt", this.file_dir + "default_"+this.version+"_fs.txt").then(function(response){
             shaderInstance.create_program(response[0], response[1]);
 

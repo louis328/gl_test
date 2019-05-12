@@ -6,7 +6,7 @@ export class PanelShader extends Shader {
         super(gl);
         let shaderInstance = this;
         
-        this.fetch_shader(this.file_dir + "panel_1_vs.txt", this.file_dir + "skin_1_fs.txt").then(function(response){
+        this.fetch_shader(this.file_dir + "panel_1_vs.txt", this.file_dir + "panel_1_fs.txt").then(function(response){
             shaderInstance.create_program(response[0], response[1]);
 
             shaderInstance.attLocation[0] = gl.getAttribLocation(shaderInstance.prg, 'position');
@@ -27,5 +27,8 @@ export class PanelShader extends Shader {
 	setUV(uvArray){
 		this.gl.uniform2fv (this.uniLocation[1], uvArray);
 	}
-
+    setUniform(matrix, uvArray) {
+        this.gl.uniformMatrix4fv(this.uniLocation[0], false, matrix);
+        this.gl.uniform2fv (this.uniLocation[1], uvArray);
+    }
 }

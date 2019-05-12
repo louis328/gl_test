@@ -31,7 +31,7 @@ class Motion{
         req.open("GET",filepath,false);
         req.send(null);
         let text = req.responseText;
-        let json = JSON.parse(text);
+        let json = JSON.parse(text);console.log(json);
         let array = json.data;
         for (let i = 0; i < array.length; ++i) {
             let obj = array[i];

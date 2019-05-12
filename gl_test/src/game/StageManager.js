@@ -1,5 +1,5 @@
 import { ManagedObject } from '/elem/src/lib/ManagedObject.js'
-import { Polygon } from '/elem/src/lib/Polygon.js'
+import { Panel } from '/elem/src/lib/Panel.js'
 
 function normalized ([a, b]){// vex = [a, b]
     let length = Math.sqrt(a*a + b*b);
@@ -64,7 +64,7 @@ export class StageManager extends ManagedObject{
 }
 export class Block{
     constructor(x, y){
-        this.image = new Polygon("/elem/res/image/block.png");
+        this.image = new Panel("/elem/res/image/block.png");
         this.x = x;
         this.y = y;
         this.image.setPosition(this.x, this.y);

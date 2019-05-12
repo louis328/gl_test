@@ -3,7 +3,7 @@ import * as shader from "./shader.js";
 import {resManager} from './ResourceManager.js';
 import {objManager} from './ObjectManager.js';
 
-export class Polygon {
+export class Panel {
     constructor(tex_address){
         this.address = tex_address;
 
@@ -25,26 +25,17 @@ export class Polygon {
             1.0, -1.0,  0.0,
             -1.0, -1.0,  0.0
         ];
-        this.vertex_normal = [
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0
-        ];
         this.vertex_index = 
 		[
 			0,1,2, 2,1,3
         ];
         this.textureCoord = 
 		[
-            1.0, 0.0,
-            0.0, 0.0,
-            1.0, 1.0,
-            0.0, 1.0
+            0,1,2,3
         ];
         this.uvArray = 
 		[
-            0,0, 1,0, 0,1, 1,1
+            1,0, 0,0, 1,1, 0,1
         ];
         this.uvDefault = true;//trueの場合、uvArrayは初期値を用いる
 
@@ -52,12 +43,14 @@ export class Polygon {
         this.indices = 	this.vertex_index.length;
         let gl = canvas.getGLContext();
         this.pos_vbo = shader.create_vbo(gl, this.vertex_position);
-        this.normal_vbo = shader.create_vbo(gl, this.vertex_normal);
         this.tex_vbo = shader.create_vbo(gl, this.textureCoord);
-        this.VBOList = [this.pos_vbo, this.normal_vbo, this.tex_vbo];
+        this.VBOList = [this.pos_vbo,  this.tex_vbo];
         this.IBO = shader.create_ibo(gl, this.vertex_index);
         this.deadFlag = false;
         
+        this.registerMyselfToManager();
+    }
+    registerMyselfToManager(){
         objManager.drawArray.push(this);
     }
     dead(){

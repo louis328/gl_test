@@ -19,12 +19,12 @@ class KeyManager extends ManagedObject{
     pressFunction(event){
         let keyCode = event.keyCode;
         //console.log("key press: " + keyCode);
-        document.getElementById('canvas').keyManager.keyState[keyCode] = true;
+        document.getElementById('nio').keyManager.keyState[keyCode] = true;
     }
     releaseFunction(event){
         let keyCode = event.keyCode;
         //console.log("key release: " + keyCode);
-        document.getElementById('canvas').keyManager.keyState[keyCode] = false;
+        document.getElementById('nio').keyManager.keyState[keyCode] = false;
     }
     process(){
         let state = this.keyState;

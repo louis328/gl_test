@@ -1,12 +1,14 @@
 
-import {CANVAS_WIDTH, CANVAS_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT} from './Config.js';
-import {Shader, SecondShader, ShaderForSkinMesh} from './Shader.js';
-import {ProjShader } from './shader/ProjShader.js';
-import {DefaultShader } from './shader/DefaultShader.js';
-import {SkinShader } from './shader/SkinShader.js';
-import {objManager} from './ObjectManager.js';
-import {resManager} from './ResourceManager.js';
-import {qtLIB, matLIB} from './minMatrix.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from './Config.js';
+import { Shader, SecondShader, ShaderForSkinMesh } from './Shader.js';
+import { ProjShader } from './shader/ProjShader.js';
+import { DefaultShader } from './shader/DefaultShader.js';
+import { SkinShader } from './shader/SkinShader.js';
+import { PanelShader } from './shader/PanelShader.js';
+import { BoardShader } from './shader/BoardShader.js';
+import { objManager} from './ObjectManager.js';
+import { resManager } from './ResourceManager.js';
+import { qtLIB, matLIB } from './minMatrix.js';
 
 class Canvas {
     constructor() {
@@ -53,6 +55,8 @@ class Canvas {
         this.shader1 = new DefaultShader(this.context_gl, this.version);
         this.shader2 = new ProjShader(this.context_gl, this.version);
         this.shader_skin = new SkinShader(this.context_gl, this.version);
+        this.shader_panel = new PanelShader(this.context_gl, this.version);
+        this.shader_board = new BoardShader(this.context_gl, this.version);
         this.fBuffer = this.create_framebuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
         
         
@@ -133,6 +137,7 @@ class Canvas {
         let vMatrix   = matLIB.identity(matLIB.create());
         let pMatrix   = matLIB.identity(matLIB.create());
         let vpMatrix  = matLIB.identity(matLIB.create());
+        let toCamMatrix  = matLIB.identity(matLIB.create());
 
         let camera = objManager.getObject("camera");
         if(camera === undefined){return;}
@@ -141,7 +146,9 @@ class Canvas {
         matLIB.perspective(60, CANVAS_WIDTH / CANVAS_HEIGHT, 0.1, camera.getDistance() * 5.0, pMatrix);
         matLIB.multiply(pMatrix, vMatrix, vpMatrix);
 
-        
+        matLIB.lookAt(camera.getPosition(), camera.getPoint(), camera.getUpDirection(), toCamMatrix);
+        matLIB.inverse(toCamMatrix, toCamMatrix);
+        toCamMatrix[12] = 0;toCamMatrix[13] = 0;toCamMatrix[14] = 0;
 
         let modelArray = objManager.getModelArray();
         for(let model of modelArray){
@@ -150,7 +157,8 @@ class Canvas {
                 let meshNumber = node.mesh;
                 if(meshNumber !== undefined){//meshの指定がある
                     let shader = this.shader1;
-                    if(node.skin !== undefined && model.file_data.skins !== undefined){//skinがあるので設定する
+                    if(node.skin !== undefined && model.file_data.skins !== undefined){
+                        //skinがあるので専用シェーダを設定する
                         let skin = model.file_data.skins[node.skin];
                         let root_joint_index = skin.skeleton;//ルートジョイントの番号
                         
@@ -164,29 +172,33 @@ class Canvas {
                     let mMatrix   = matLIB.identity(matLIB.create());
                     for(let primitive of mesh.primitives){
                         matLIB.translate(mMatrix, [model.position.x, model.position.y, model.position.z], mMatrix);//modelのtransを反映
-                        this.drawModel(primitive, shader, mMatrix, vpMatrix);
+                        this.drawModel(primitive, shader, mMatrix, vpMatrix, camera.getPosition());
                     }
                 }
             }
         }
+        let boardArray = objManager.getBoardArray();
+        for(let board of boardArray){
+            this.drawBoard(board, vpMatrix, toCamMatrix);
+        }
+        //透過処理のため、後から描画
         let drawArray = objManager.getDrawArray();
         for(let drawObj of drawArray){
-            this.drawPolygon(drawObj, vpMatrix);
+            this.drawPanel(drawObj, vpMatrix);
         }
     }
 
-    drawModel(obj, shader, mMatrix, vpMatrix){//obj:primitive
+    drawModel(obj, shader, mMatrix, vpMatrix, cameraPosition){//obj:primitive
         let texture = resManager.getTexture(obj.materialData.pbrMetallicRoughness.baseColorTexture.uri);
         if(texture === null){
             return;
         }
         matLIB.translate(mMatrix, [0.0, 0.0, 0.0], mMatrix);
-        matLIB.rotate(mMatrix, 0.04/3.14 * this.time , [0, 1, 0], mMatrix);
+        matLIB.rotate(mMatrix, -3.14 * 0.5 , [0, 1, 0], mMatrix);
         matLIB.scale(mMatrix, [1, 1, 1.0], mMatrix);
 
         let normalMatrix = matLIB.identity(matLIB.create());
         let lightVec = [5.0, -25, -5.0];
-        let cameraPosition = [0.0, 0.0, 1.0];
 
         let mvpMatrix = matLIB.identity(matLIB.create());
         matLIB.multiply(vpMatrix, mMatrix, mvpMatrix);
@@ -195,7 +207,7 @@ class Canvas {
         matLIB.transpose(invMatrix, normalMatrix);
 
         this.context_gl.useProgram(shader.getPrg());
-        //shader.setUniform(matLIB.identity(matLIB.create()), vpMatrix, normalMatrix, lightVec, cameraPosition);
+
         shader.setUniform(mMatrix, mvpMatrix, normalMatrix, lightVec, cameraPosition);
         
         this.context_gl.activeTexture(this.context_gl.TEXTURE0);
@@ -204,7 +216,33 @@ class Canvas {
         this.context_gl.bindBuffer(this.context_gl.ELEMENT_ARRAY_BUFFER, obj.vertexIndexBuffer);
         this.context_gl.drawElements(this.context_gl.TRIANGLES, obj.indexCount, this.context_gl.UNSIGNED_SHORT, 0);
     }
-    drawPolygon(obj, vpMatrix){
+    drawBoard(obj, vpMatrix, toCamMatrix){
+        let texture = resManager.getTexture(obj.getTextureAddress());
+        if(texture === null){
+            return;
+        }
+        let mMatrix = matLIB.identity(matLIB.create());
+
+        matLIB.translate(mMatrix, [obj.getPosition().x, obj.getPosition().y, obj.getPosition().z], mMatrix);
+        //matLIB.rotate(mMatrix, 0.1/3.14 * this.time , [0, 1, 0], mMatrix);
+
+        matLIB.multiply(mMatrix, toCamMatrix, mMatrix);
+
+        let scaleX = 1.0 * texture.width / CANVAS_WIDTH * obj.getScale().x;
+        let scaleY = 1.0 * texture.height / CANVAS_HEIGHT * obj.getScale().y;
+        //matLIB.scale(mMatrix, [scaleX, scaleY, 1.0], mMatrix);
+
+        matLIB.multiply(vpMatrix, mMatrix, mMatrix);
+        this.context_gl.useProgram(this.shader_board.getPrg());
+        this.shader_board.setUniform(mMatrix);
+
+        this.context_gl.activeTexture(this.context_gl.TEXTURE0);
+        this.context_gl.bindTexture(this.context_gl.TEXTURE_2D, texture);
+        this.shader_board.set_attribute(obj.getVBO());
+        this.context_gl.bindBuffer(this.context_gl.ELEMENT_ARRAY_BUFFER, obj.getIBO());
+        this.context_gl.drawElements(this.context_gl.TRIANGLES, obj.getIndices(), this.context_gl.UNSIGNED_SHORT, 0);
+    }
+    drawPanel(obj, vpMatrix){
         let texture = resManager.getTexture(obj.getTextureAddress());
         if(texture === null){
             return;
@@ -213,27 +251,18 @@ class Canvas {
 
         let draw_x = (obj.getPosition().x - (VIEWPORT_WIDTH - CANVAS_WIDTH) / 2) / VIEWPORT_WIDTH * 2;
         let draw_y = (obj.getPosition().y - (VIEWPORT_HEIGHT - CANVAS_HEIGHT) / 2) / VIEWPORT_HEIGHT * 2;
-        matLIB.translate(mMatrix, [draw_x, draw_y, 0], mMatrix);
+        matLIB.translate(mMatrix, [draw_x, draw_y, 0.0], mMatrix);
         //matLIB.rotate(mMatrix, obj.getRotate() , [0, 0, 1], mMatrix);
-        let scaleX = 1.0 * texture.width / VIEWPORT_WIDTH * obj.getScale().x;
-        let scaleY = 1.0 * texture.height / VIEWPORT_HEIGHT * obj.getScale().y;
-        matLIB.scale(mMatrix, [1, 1, 1.0], mMatrix);
+        let scaleX = 1.0 * texture.width / CANVAS_WIDTH * obj.getScale().x;
+        let scaleY = 1.0 * texture.height / CANVAS_HEIGHT * obj.getScale().y;
+        matLIB.scale(mMatrix, [scaleX, scaleY, 1.0], mMatrix);
 
-        let normal = matLIB.identity(matLIB.create());
-        let lightVec = [12.0, -12.0, 12.0];
-        let cameraPosition = [0.0, 0.0, 15.0];
-
-        let mvpMatrix = matLIB.identity(matLIB.create());
-        matLIB.multiply(vpMatrix, mMatrix, mvpMatrix);
-        let invMatrix = matLIB.identity(matLIB.create());
-        //matLIB.inverse(mMatrix, invMatrix);
-        matLIB.transpose(invMatrix, normal);
-
-        this.shader1.setUniform(mMatrix, mvpMatrix, normal, lightVec, cameraPosition);
+        this.context_gl.useProgram(this.shader_panel.getPrg());
+        this.shader_panel.setUniform(mMatrix, obj.getUVArray());
 
         this.context_gl.activeTexture(this.context_gl.TEXTURE0);
         this.context_gl.bindTexture(this.context_gl.TEXTURE_2D, texture);
-        shader.set_attribute(this.context_gl, obj.getVBO());
+        this.shader_panel.set_attribute(obj.getVBO());
         this.context_gl.bindBuffer(this.context_gl.ELEMENT_ARRAY_BUFFER, obj.getIBO());
         this.context_gl.drawElements(this.context_gl.TRIANGLES, obj.getIndices(), this.context_gl.UNSIGNED_SHORT, 0);
     }
