@@ -1,12 +1,14 @@
 
 attribute vec3 position;
-attribute vec2 texCoord;
+attribute float textureCoord;
 
 uniform mat4 mvpMatrix;
+uniform vec2 UVArray[4];
 
 varying vec2 vTexCoord;
 
 void main(void){
-        vTexCoord = texCoord;
+        vTexCoord.x = UVArray[int(textureCoord)].x;
+        vTexCoord.y = UVArray[int(textureCoord)].y;
         gl_Position = mvpMatrix * vec4(position, 1.0);
 }

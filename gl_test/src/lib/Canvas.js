@@ -48,7 +48,8 @@ class Canvas {
         canvas_element.appendChild(canvas_2d);
         canvas_2d.width = CANVAS_WIDTH;
         canvas_2d.height = CANVAS_HEIGHT;
-        this.context_2d = canvas_2d.getContext("2d");
+        canvas_2d.style = 'visibility:hidden;';
+        this.context_2d = canvas_2d.getContext("2d");//テキスト描画用なので2d
 
         this.context_gl.viewport(0, 0, VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
 
@@ -133,7 +134,6 @@ class Canvas {
     }
     //描画
     draw() {
-        
         let vMatrix   = matLIB.identity(matLIB.create());
         let pMatrix   = matLIB.identity(matLIB.create());
         let vpMatrix  = matLIB.identity(matLIB.create());
@@ -194,8 +194,8 @@ class Canvas {
             return;
         }
         matLIB.translate(mMatrix, [0.0, 0.0, 0.0], mMatrix);
-        matLIB.rotate(mMatrix, -3.14 * 0.5 , [0, 1, 0], mMatrix);
-        matLIB.scale(mMatrix, [1, 1, 1.0], mMatrix);
+        //matLIB.rotate(mMatrix, -3.14 * 0.5 , [0, 1, 0], mMatrix);
+        matLIB.scale(mMatrix, [1, 1, 1], mMatrix);
 
         let normalMatrix = matLIB.identity(matLIB.create());
         let lightVec = [5.0, -25, -5.0];
@@ -228,13 +228,13 @@ class Canvas {
 
         matLIB.multiply(mMatrix, toCamMatrix, mMatrix);
 
-        let scaleX = 1.0 * texture.width / CANVAS_WIDTH * obj.getScale().x;
-        let scaleY = 1.0 * texture.height / CANVAS_HEIGHT * obj.getScale().y;
-        //matLIB.scale(mMatrix, [scaleX, scaleY, 1.0], mMatrix);
+        //let scaleX = 1.0 * texture.width / CANVAS_WIDTH * obj.getScale().x;
+        //let scaleY = 1.0 * texture.height / CANVAS_HEIGHT * obj.getScale().y;
+        matLIB.scale(mMatrix, [1, 1, 1.0], mMatrix);
 
         matLIB.multiply(vpMatrix, mMatrix, mMatrix);
         this.context_gl.useProgram(this.shader_board.getPrg());
-        this.shader_board.setUniform(mMatrix);
+        this.shader_board.setUniform(mMatrix, obj.getUVArray());
 
         this.context_gl.activeTexture(this.context_gl.TEXTURE0);
         this.context_gl.bindTexture(this.context_gl.TEXTURE_2D, texture);
@@ -273,17 +273,35 @@ class Canvas {
     }
     //fameBufferからcanvasへ
     drawCanvas(){
-        this.context_gl.activeTexture(this.context_gl.TEXTURE1);
-        this.context_gl.bindTexture(this.context_gl.TEXTURE_2D, this.fBuffer.texture);
+        let gl = this.context_gl;
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.fBuffer.texture);
 
-        this.context_gl.bindFramebuffer(this.context_gl.FRAMEBUFFER, null);
-        this.context_gl.clearColor(0.7, 0.7, 0.7, 1.0);
-        this.context_gl.clearDepth(1.0);
-        this.context_gl.clear(this.context_gl.COLOR_BUFFER_BIT | this.context_gl.DEPTH_BUFFER_BIT);
-        this.context_gl.viewport(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.clearColor(0.7, 0.7, 0.7, 1.0);
+        gl.clearDepth(1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.viewport(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         this.shader2.draw();
         
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);//テクスチャを上下反転
+        for (let text of objManager.textArray) {
+            this.context_2d.fillStyle = text.color;
+            this.context_2d.font = text.size + " 'ＭＳ Ｐゴシック'";
+            this.context_2d.fillText(text.text, text.x, text.y);
+        }
+        let spiritTexture= gl.createTexture(CANVAS_WIDTH, CANVAS_HEIGHT);
+        let imageData= this.context_2d.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        gl.bindTexture(gl.TEXTURE_2D, spiritTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        
+        gl.generateMipmap(gl.TEXTURE_2D);
+        this.shader2.draw();
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);//上下反転を解除
     }
     getGLContext() {
         return this.context_gl;
@@ -292,11 +310,11 @@ class Canvas {
         let gl = this.context_gl;
         var frameBuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-        var depthRenderBuffer = gl.createRenderbuffer();
+        let depthRenderBuffer = gl.createRenderbuffer();
         gl.bindRenderbuffer(gl.RENDERBUFFER, depthRenderBuffer);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthRenderBuffer);
-        var fTexture = gl.createTexture();
+        let fTexture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, fTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);

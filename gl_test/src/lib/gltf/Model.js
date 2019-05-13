@@ -303,7 +303,7 @@ export class Model{
             if(baseColorTexture !== undefined){
                 baseColorTexture.uri = this.file_data.images[baseColorTexture.index].uri;
             }
-            else{console.log("qqq");
+            else{
                 primitive.materialData.pbrMetallicRoughness.baseColorTexture = new Object();
                 primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri = this.root_path + "/src/lib/gltf/default.png";
             }console.log(primitive.materialData.pbrMetallicRoughness.baseColorTexture.uri);

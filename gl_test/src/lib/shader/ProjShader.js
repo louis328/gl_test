@@ -23,10 +23,10 @@ export class ProjShader extends Shader {
             0.0, 0.0, 1.0
             ];
             shaderInstance.planeTexCoord = [
-            1.0, 0.0,
-            0.0, 0.0,
             1.0, 1.0,
-            0.0, 1.0
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
             ];
             shaderInstance.planeIndex = [
                 0, 1, 2, 2, 1, 3

@@ -8,8 +8,8 @@ export class Billboard extends Panel{
     constructor(tex_address){
         super(tex_address);
 
-        this.uv_vbo = shader.create_vbo(canvas.getGLContext(), this.uvArray);
-        this.VBOList = [this.pos_vbo,  this.uv_vbo];
+        //this.uv_vbo = shader.create_vbo(canvas.getGLContext(), this.uvArray);
+        //this.VBOList = [this.pos_vbo,  this.uv_vbo];
 
         this.x = 0.0;
         this.y = 0.0;

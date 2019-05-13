@@ -6,6 +6,7 @@ class ObjectManager{
         this.drawArray = new Array();//描画対象を格納する配列(2D)
         this.boardArray = new Array();//Billboardを格納する
         this.modelArray = new Array();//gltfをまるごと入れる
+        this.textArray = new Array();//テキストを格納
     }
     process(){
         //console.log(Object.keys(this.objHash));

@@ -4,17 +4,20 @@ import { Billboard } from '../../../../gl_test/src/lib/Billboard.js'
 import { motionController} from '../../../../gl_test/src/lib/MotionController.js';
 import { keyManager} from '../../../../gl_test/src/lib/KeyManager.js';
 
+import { Text } from '../../../../gl_test/src/lib/Text.js'
+
 export class Player extends ManagedObject{
     constructor(){
         super("player");
         this.image = new Panel("/gl_test/res/image/hiyoko.png");
         this.motion = motionController.create("../../../../gl_test/res/motion/motion_hiyoko.json");
-        this.motion.start("stand");
+        this.motion.start("walk");
         
-        this.board = new Billboard("/gl_test/res/image/block2.png");
+        this.board = new Billboard("/gl_test/res/image/hiyoko.png");
         this.board.x = 5;
         this.board.y = 2;
-        
+        this.text = new Text("yeah", 100, 100);
+
         this.image.setUVArray(this.motion.getUV());
         this.width = 40;
         this.height = 45;
@@ -74,6 +77,8 @@ export class Player extends ManagedObject{
         }
         this.image.setUVArray(this.motion.getUV());
         this.image.setPosition(this.x, this.y);
+
+        this.board.setUVArray(this.motion.getUV());console.log(this.motion.getUV());
     }
     receive(message){
         if(message["message"] === "hit_character" && message["id"] === "player"){
