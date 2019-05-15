@@ -43,7 +43,7 @@ class Canvas {
             this.messageBox.textContent = 'webbl非対応 ' + e;
             return false;
         }
-        //let canvas_2d = document.getElementById("frontCanvas");//テキスト用
+        //テキスト用
         let canvas_2d = document.createElement('canvas');
         canvas_element.appendChild(canvas_2d);
         canvas_2d.width = CANVAS_WIDTH;

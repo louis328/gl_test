@@ -78,7 +78,7 @@ export class Player extends ManagedObject{
         this.image.setUVArray(this.motion.getUV());
         this.image.setPosition(this.x, this.y);
 
-        this.board.setUVArray(this.motion.getUV());console.log(this.motion.getUV());
+        this.board.setUVArray(this.motion.getUV());
     }
     receive(message){
         if(message["message"] === "hit_character" && message["id"] === "player"){
